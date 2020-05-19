@@ -189,7 +189,7 @@ MonoBehaviour:
   gravity: -12
   jumpHeight: 1
   airControlPercent: 0
-  turnSmoothTime: 0.1
+  turnSmoothTime: 0.2
   speedSmoothTime: 0.15
 --- !u!1 &170076733
 GameObject:
@@ -543,7 +543,7 @@ MonoBehaviour:
   target: {fileID: 52896511}
   dstFromTarget: 6
   pitchMinMax: {x: -40, y: 85}
-  rotationSmoothTime: 0.12
+  rotationSmoothTime: 0
   fovZoom: 20
   fovNormal: 60
   zoomSmoothTime: 5

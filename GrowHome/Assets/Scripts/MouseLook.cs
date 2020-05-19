@@ -17,6 +17,8 @@ public class MouseLook : MonoBehaviour
     float pitch;
     float yaw;
 
+    //This should only be on cameraCollision branch
+
     public int fovZoom = 20;
     public int fovNormal = 60; //60 is default fov
     public float zoomSmoothTime = 5f;
