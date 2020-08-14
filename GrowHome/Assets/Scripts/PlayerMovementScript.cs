@@ -7,7 +7,7 @@ public class PlayerMovementScript : MonoBehaviour
     // Start is called before the first frame update
     public float walkSpeed = 2f;
     public float runSpeed = 6f;
-    public float gravity = -12f;
+    public float gravity = -30f;
     public float jumpHeight = 1f;
     [Range(0,1)]
     public float airControlPercent;
@@ -100,8 +100,8 @@ public class PlayerMovementScript : MonoBehaviour
 
     private bool isGrounded()
     {
-        Debug.DrawRay(transform.position, Vector3.down * 0.15f, Color.red);
-        bool grounded = Physics.Raycast(transform.position, Vector3.down, 0.15f);
-        return grounded;
+
+        return Physics.Raycast(transform.position, Vector3.down, 0.15f);
+        
     }
 }
