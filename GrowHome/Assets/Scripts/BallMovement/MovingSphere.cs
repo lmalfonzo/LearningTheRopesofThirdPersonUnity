@@ -7,7 +7,6 @@ public class MovingSphere: MonoBehaviour
 
     [SerializeField, Range (0f, 100f)]
     float maxSpeed = 10f;
-    Vector3 velocity, desiredVelocity;
 
     [SerializeField, Range(0f, 100f)]
     float maxAcceleration = 10, maxAirAcceleration = 1f;
@@ -39,7 +38,9 @@ public class MovingSphere: MonoBehaviour
     [SerializeField]
     Transform playerInputSpace = default;
 
-    Rigidbody body;
+    Vector3 velocity, desiredVelocity, connectionVelocity;
+
+    Rigidbody body, connectedBody, previousConnectedBody;
 
     bool desiredJump;
     int groundContactCount, steepContactCount;
@@ -60,6 +61,8 @@ public class MovingSphere: MonoBehaviour
 
     [SerializeField, Range(90, 180)]
     float maxClimbAngle = 140f;
+
+    Vector3 connectionWorldPosition, connectionLocalPosition;
 
     void OnValidate()
     {
@@ -125,7 +128,9 @@ public class MovingSphere: MonoBehaviour
     void ClearState()
     {
         groundContactCount = steepContactCount = 0 ;
-        contactNormal = steepNormal = climbNormal = Vector3.zero;
+        contactNormal = steepNormal = climbNormal = connectionVelocity =  Vector3.zero;
+        previousConnectedBody = connectedBody;
+        connectedBody = null;
     }
 
     void Jump(Vector3 gravity)
@@ -196,6 +201,27 @@ public class MovingSphere: MonoBehaviour
             contactNormal = upAxis;
         }
 
+        if (connectedBody)
+        {
+            if (connectedBody.isKinematic || connectedBody.mass >= body.mass)
+            {
+                UpdateConnectionState();
+            }
+        }
+    }
+
+    void UpdateConnectionState()
+    {
+        if (connectedBody == previousConnectedBody)
+        {
+            Vector3 connectionMovement =
+                connectedBody.transform.TransformPoint(connectionLocalPosition) - 
+                connectionWorldPosition;
+            connectionVelocity = connectionMovement / Time.deltaTime;
+        }
+        connectionWorldPosition = body.position;
+        connectionLocalPosition = connectedBody.transform.InverseTransformPoint(
+            connectionWorldPosition);
     }
 
     bool CheckSteepContacts()
@@ -234,11 +260,16 @@ public class MovingSphere: MonoBehaviour
             {
                 groundContactCount += 1;
                 contactNormal += normal;
+                connectedBody = collision.rigidbody;
             }
             else if (upDot > -0.01f)
             {
                 steepContactCount++;
                 steepNormal += normal;
+                if (groundContactCount == 0)
+                {
+                    connectedBody = collision.rigidbody;
+                }
             }
         }
     }
@@ -258,8 +289,9 @@ public class MovingSphere: MonoBehaviour
         Vector3 xAxis = ProjectOnDirectionPlane(rightAxis, contactNormal);
         Vector3 zAxis = ProjectOnDirectionPlane(forwardAxis, contactNormal);
 
-        float currentX = Vector3.Dot(velocity, xAxis);
-        float currentZ = Vector3.Dot(velocity, zAxis);
+        Vector3 relativeVelocity = velocity - connectionVelocity;
+        float currentX = Vector3.Dot(relativeVelocity, xAxis);
+        float currentZ = Vector3.Dot(relativeVelocity, zAxis);
 
         float acceleration = OnGround ? maxAcceleration : maxAirAcceleration;
         float maxSpeedChange = acceleration * Time.deltaTime;
@@ -300,6 +332,7 @@ public class MovingSphere: MonoBehaviour
         
         float dot = Vector3.Dot(velocity, hit.normal);
         velocity = (velocity - hit.normal * dot).normalized * speed;
+        connectedBody = hit.rigidbody;
         return true;
     }
 
