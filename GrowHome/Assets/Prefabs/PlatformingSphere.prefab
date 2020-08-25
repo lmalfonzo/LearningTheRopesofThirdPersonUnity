@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1465024789}
   - component: {fileID: 1465024788}
   m_Layer: 10
-  m_Name: SphereFinal
+  m_Name: PlatformingSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -218,11 +218,15 @@ MonoBehaviour:
   probeDistance: 1
   probeMask:
     serializedVersion: 2
-    m_Bits: 4915
+    m_Bits: 13107
   stairsMask:
     serializedVersion: 2
     m_Bits: 4096
+  climbMask:
+    serializedVersion: 2
+    m_Bits: 4915
   playerInputSpace: {fileID: 0}
+  maxClimbAngle: 140
 --- !u!54 &1465024788
 Rigidbody:
   m_ObjectHideFlags: 0
